@@ -106,6 +106,55 @@
     </form>
 </div>
 
+<?php if($is_edit): ?>
+<!-- Feedback / Comments Section -->
+<div id="comments" class="max-w-2xl mx-auto mt-6 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors relative z-10">
+    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
+        <i class="ph ph-chat-teardrop-text text-indigo-500"></i> Feedback & Discussion
+    </h3>
+    
+    <!-- Comment List -->
+    <div class="space-y-4 mb-6">
+        <?php if(!empty($task['comments'])): ?>
+            <?php foreach($task['comments'] as $c): ?>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-sm shrink-0">
+                        <?= strtoupper(substr($c['user_name'], 0, 2)) ?>
+                    </div>
+                    <div class="flex-1 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl rounded-tl-none border border-slate-100 dark:border-slate-700/50">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm"><?= htmlspecialchars($c['user_name']) ?></span>
+                            <span class="text-xs text-slate-400"><?= date('M d, H:i', strtotime($c['created_at'])) ?></span>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm whitespace-pre-wrap"><?= htmlspecialchars($c['comment']) ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="text-center py-6 text-slate-400 dark:text-slate-500 text-sm">
+                No feedback yet. Be the first to start the discussion!
+            </div>
+        <?php endif; ?>
+    </div>
+    
+    <!-- Add Comment Form -->
+    <form action="index.php?action=task_comment" method="POST" class="flex gap-3">
+        <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
+        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm shrink-0">
+            <?= isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 2)) : 'ME' ?>
+        </div>
+        <div class="flex-1">
+            <textarea name="comment" required rows="2" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-colors text-sm" placeholder="Write your feedback here..."></textarea>
+            <div class="flex justify-end mt-2">
+                <button type="submit" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white text-sm font-medium py-2 px-6 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                    <i class="ph ph-paper-plane-right"></i> Send
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<?php endif; ?>
+
 <script>
 function addUrlField() {
     const container = document.getElementById('urls-container');

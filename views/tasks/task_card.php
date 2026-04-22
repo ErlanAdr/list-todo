@@ -63,16 +63,22 @@
                     <span class="ml-0.5"><?= count($t['urls']) ?></span>
                     
                     <!-- Tooltip with all URLs -->
-                    <div class="absolute bottom-full right-0 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 invisible group-hover/urls:opacity-100 group-hover/urls:visible transition-all z-50">
+                    <div class="absolute bottom-full right-0 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 invisible group-hover/urls:opacity-100 group-hover/urls:visible transition-all z-50 shadow-lg">
                         <?php foreach($t['urls'] as $url): ?>
                             <a href="<?= htmlspecialchars($url['url']) ?>" target="_blank" class="block truncate hover:text-indigo-300 mb-1 last:mb-0">
                                 <?= htmlspecialchars($url['url']) ?>
                             </a>
                         <?php endforeach; ?>
-                        <!-- tooltip arrow -->
                         <div class="absolute top-full right-3 border-4 border-transparent border-t-slate-800"></div>
                     </div>
                 </div>
+            <?php endif; ?>
+            
+            <?php if(!empty($t['comment_count']) && $t['comment_count'] > 0): ?>
+                <span class="flex items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" title="<?= $t['comment_count'] ?> Feedback">
+                    <i class="ph ph-chat-teardrop text-sm"></i>
+                    <span><?= $t['comment_count'] ?></span>
+                </span>
             <?php endif; ?>
             
             <?php if(!empty($t['assignment_date'])): ?>

@@ -16,8 +16,16 @@ class TaskController {
     }
 
     public function index() {
+        // Get filter parameters from GET request
         $status_filter = isset($_GET['status']) && $_GET['status'] !== '' ? $_GET['status'] : null;
-        $tasks = $this->task->readAll($status_filter);
+        $assignee_filter = isset($_GET['assigned_to']) && $_GET['assigned_to'] !== '' ? $_GET['assigned_to'] : null;
+        $date_filter = isset($_GET['date']) && $_GET['date'] !== '' ? $_GET['date'] : null;
+        
+        $tasks = $this->task->readAll($status_filter, $assignee_filter, $date_filter);
+        
+        // Fetch users for the filter dropdown
+        $stmt_users = $this->user->readAll();
+        $users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
         
         // Group tasks by status for a board view
         $board = [
@@ -40,7 +48,7 @@ class TaskController {
         $stmt_users = $this->user->readAll();
         $users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
         
-        $task = ['id'=>'', 'name'=>'', 'detail'=>'', 'assigned_to'=>'', 'status'=>'To Do', 'assignment_date'=>'', 'urls'=>[], 'images'=>[]];
+        $task = ['id'=>'', 'name'=>'', 'detail'=>'', 'assigned_to'=>'', 'status'=>'To Do', 'assignment_date'=>'', 'urls'=>[], 'images'=>[], 'comments'=>[]];
         $is_edit = false;
 
         $content = __DIR__ . '/../views/tasks/form.php';
@@ -69,7 +77,8 @@ class TaskController {
             'status' => $this->task->status,
             'assignment_date' => $this->task->assignment_date,
             'urls' => $this->task->urls,
-            'images' => $this->task->images
+            'images' => $this->task->images,
+            'comments' => $this->task->comments
         ];
         
         $stmt_users = $this->user->readAll();
@@ -102,6 +111,7 @@ class TaskController {
             $uploaded_images = [];
             if(isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
                 $upload_dir = __DIR__ . '/../public/uploads/';
+                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
                 
                 for($i = 0; $i < count($_FILES['images']['name']); $i++) {
                     $tmp_name = $_FILES['images']['tmp_name'][$i];
@@ -175,6 +185,21 @@ class TaskController {
         }
         header("Location: index.php");
         exit;
+    }
+    
+    public function add_comment() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id']) && !empty($_POST['comment'])) {
+            $this->task->id = $_POST['task_id'];
+            if ($this->task->addComment($_SESSION['user_id'], $_POST['comment'])) {
+                $_SESSION['message'] = "Feedback added!";
+                $_SESSION['msg_type'] = "success";
+            } else {
+                 $_SESSION['message'] = "Failed to add feedback.";
+                 $_SESSION['msg_type'] = "error";
+            }
+            header("Location: index.php?action=task_edit&id=" . $_POST['task_id'] . "#comments");
+            exit;
+        }
     }
 }
 ?>

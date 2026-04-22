@@ -1,10 +1,38 @@
-<div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-    <div class="relative w-full sm:w-64">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="ph ph-magnifying-glass text-gray-400"></i>
+<div class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors relative z-10">
+    <form action="index.php" method="GET" class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <input type="hidden" name="action" value="index">
+        
+        <!-- Search & Filter Controls -->
+        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <!-- Client-side text search -->
+            <div class="relative w-full md:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ph ph-magnifying-glass text-gray-400"></i>
+                </div>
+                <input type="text" id="searchInput" onkeyup="filterTasks()" placeholder="Search tasks..." class="pl-10 w-full border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 border transition-colors">
+            </div>
+
+            <!-- Server-side filters -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <select name="assigned_to" onchange="this.form.submit()" class="w-full md:w-auto border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 pl-3 pr-8 border transition-colors text-sm">
+                    <option value="">All Users</option>
+                    <?php foreach($users as $u): ?>
+                        <option value="<?= $u['id'] ?>" <?= isset($_GET['assigned_to']) && $_GET['assigned_to'] == $u['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($u['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <input type="date" name="date" value="<?= isset($_GET['date']) ? htmlspecialchars($_GET['date']) : '' ?>" onchange="this.form.submit()" class="w-full md:w-auto border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors text-sm">
+                
+                <?php if(!empty($_GET['assigned_to']) || !empty($_GET['date'])): ?>
+                    <a href="index.php" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg transition-colors" title="Clear Filters">
+                        <i class="ph ph-x"></i>
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
-        <input type="text" id="searchInput" onkeyup="filterTasks()" placeholder="Search tasks..." class="pl-10 w-full border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 border transition-colors z-10 relative">
-    </div>
+    </form>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full items-start relative z-10">

@@ -15,27 +15,44 @@ class Task {
     // Arrays for advanced features
     public $urls = [];
     public $images = [];
+    public $comments = [];
+    public $comment_count = 0;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    // Read tasks with user info
-    public function readAll($status_filter = null) {
-        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, u.name as assignee_name 
+    // Read tasks with user info and filters
+    public function readAll($status_filter = null, $assignee_filter = null, $date_filter = null) {
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, u.name as assignee_name,
+                  (SELECT COUNT(*) FROM task_comments tc WHERE tc.task_id = t.id) as comment_count
                   FROM " . $this->table_name . " t 
-                  LEFT JOIN users u ON t.assigned_to = u.id ";
-                  
-        if ($status_filter) {
-            $query .= " WHERE t.status = :status ";
+                  LEFT JOIN users u ON t.assigned_to = u.id 
+                  WHERE 1=1 ";
+        
+        $params = [];
+        
+        if (!empty($status_filter)) {
+            $query .= " AND t.status = :status ";
+            $params[':status'] = $status_filter;
+        }
+        
+        if (!empty($assignee_filter)) {
+            $query .= " AND t.assigned_to = :assigned_to ";
+            $params[':assigned_to'] = $assignee_filter;
+        }
+        
+        if (!empty($date_filter)) {
+            $query .= " AND t.assignment_date = :date ";
+            $params[':date'] = $date_filter;
         }
                   
         $query .= " ORDER BY t.created_at DESC";
 
         $stmt = $this->conn->prepare($query);
         
-        if ($status_filter) {
-            $stmt->bindParam(":status", $status_filter);
+        foreach($params as $key => &$val) {
+            $stmt->bindParam($key, $val);
         }
 
         $stmt->execute();
@@ -70,6 +87,7 @@ class Task {
             
             $this->urls = $this->getUrls($this->id);
             $this->images = $this->getImages($this->id);
+            $this->comments = $this->getComments($this->id);
         }
     }
 
@@ -128,12 +146,8 @@ class Task {
         $stmt->bindParam(":id", $this->id);
 
         if($stmt->execute()) {
-            // Delete old urls and re-insert
             $this->conn->exec("DELETE FROM task_urls WHERE task_id = " . $this->id);
             $this->saveUrls();
-            
-            // We append new images, don't delete old ones automatically unless requested, 
-            // but for simplicity in this update we just append new uploaded ones.
             $this->saveImages();
             return true;
         }
@@ -147,7 +161,6 @@ class Task {
         $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt->bindParam(1, $this->id);
 
-        // Delete associated physical image files
         $images = $this->getImages($this->id);
         foreach($images as $img) {
             $file = __DIR__ . '/../public/' . $img['file_path'];
@@ -160,6 +173,28 @@ class Task {
             return true;
         }
         return false;
+    }
+    
+    // Add Comment
+    public function addComment($user_id, $comment_text) {
+        $stmt = $this->conn->prepare("INSERT INTO task_comments (task_id, user_id, comment) VALUES (?, ?, ?)");
+        if($stmt->execute([$this->id, $user_id, htmlspecialchars(strip_tags($comment_text))])) {
+            return true;
+        }
+        return false;
+    }
+    
+    // Get Comments
+    private function getComments($task_id) {
+        $stmt = $this->conn->prepare("
+            SELECT tc.id, tc.comment, tc.created_at, u.name as user_name 
+            FROM task_comments tc 
+            JOIN users u ON tc.user_id = u.id 
+            WHERE tc.task_id = ? 
+            ORDER BY tc.created_at ASC
+        ");
+        $stmt->execute([$task_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     // Helpers for URLs

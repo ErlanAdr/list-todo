@@ -59,6 +59,12 @@ switch ($action) {
         $controller->update_status();
         break;
 
+    case 'task_comment':
+        require_once __DIR__ . '/../controllers/TaskController.php';
+        $controller = new TaskController();
+        $controller->add_comment();
+        break;
+
     case 'users':
         require_once __DIR__ . '/../controllers/UserController.php';
         $controller = new UserController();
