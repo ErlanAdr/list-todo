@@ -195,6 +195,23 @@ class Task {
         return false;
     }
     
+    // Update status only
+    public function updateStatusOnly() {
+        $query = "UPDATE " . $this->table_name . " SET status=:status WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        
+        $this->status = htmlspecialchars(strip_tags($this->status));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":id", $this->id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+    
     // Add Comment
     public function addComment($user_id, $comment_text) {
         $stmt = $this->conn->prepare("INSERT INTO task_comments (task_id, user_id, comment) VALUES (?, ?, ?)");

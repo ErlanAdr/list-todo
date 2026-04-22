@@ -230,10 +230,9 @@ class TaskController {
     public function update_status() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id']) && isset($_POST['status'])) {
             $this->task->id = $_POST['id'];
-            $this->task->readOne();
-            
             $this->task->status = $_POST['status'];
-            if ($this->task->update()) {
+            
+            if ($this->task->updateStatusOnly()) {
                 $_SESSION['message'] = "Task status updated!";
                 $_SESSION['msg_type'] = "success";
             } else {

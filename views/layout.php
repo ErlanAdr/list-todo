@@ -195,8 +195,8 @@
                 <?php require_once $content; ?>
                 
                 <!-- Footer -->
-                <div class="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500">
-                    Copyright 2026 Erlan Andriansyah/bxbxBxy
+                <div class="mt-10 mb-4 pt-6 border-t border-slate-200/50 dark:border-slate-700/50 text-center text-sm font-medium text-slate-400 dark:text-slate-500 relative z-10">
+                    &copy; 2026 Erlan Andriansyah &bull; bxbxBxy
                 </div>
             </div>
         </div>
