@@ -94,8 +94,10 @@
         <!-- Images Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Upload Images</label>
-                <input type="file" name="images[]" multiple accept="image/*" class="w-full text-sm text-slate-500 dark:text-slate-400
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Upload Images <span class="text-xs font-normal text-slate-400 ml-1">(Max 2MB per image)</span>
+                </label>
+                <input type="file" name="images[]" id="image-upload" multiple accept="image/*" class="w-full text-sm text-slate-500 dark:text-slate-400
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-lg file:border-0
                     file:text-sm file:font-medium
@@ -207,5 +209,27 @@ function addUrlField() {
         <button type="button" onclick="this.parentElement.remove()" class="px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg border border-transparent"><i class="ph ph-trash"></i></button>
     `;
     container.appendChild(newRow);
+}
+
+// Image upload size validation
+const imageUpload = document.getElementById('image-upload');
+if (imageUpload) {
+    imageUpload.addEventListener('change', function(e) {
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        let hasError = false;
+        
+        for(let i = 0; i < this.files.length; i++) {
+            if(this.files[i].size > maxSize) {
+                alert('CEKAL: Gambar "' + this.files[i].name + '" terlalu besar! Maksimal ukuran yang diperbolehkan adalah 2MB.');
+                hasError = true;
+                break;
+            }
+        }
+        
+        // If any file is too large, clear the entire input selection to block the upload process
+        if (hasError) {
+            this.value = '';
+        }
+    });
 }
 </script>

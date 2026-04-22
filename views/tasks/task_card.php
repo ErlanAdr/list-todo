@@ -1,4 +1,4 @@
-<a href="index.php?action=task_edit&id=<?= $t['id'] ?>" class="task-card block bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10 border-l-4 border-l-transparent hover:border-l-indigo-500">
+<div onclick="window.location.href='index.php?action=task_edit&id=<?= $t['id'] ?>'" class="task-card block bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10 border-l-4 border-l-transparent hover:border-l-indigo-500">
     
     <!-- Header: Title & Department -->
     <div class="flex items-start justify-between gap-2">
@@ -19,7 +19,7 @@
     <?php if(!empty($t['images'])): ?>
         <div class="flex flex-wrap gap-1 mt-1">
             <?php foreach(array_slice($t['images'], 0, 3) as $img): ?>
-                <a href="<?= htmlspecialchars($img['file_path']) ?>" target="_blank" class="w-10 h-10 rounded-md overflow-hidden border border-slate-200 dark:border-slate-600 block">
+                <a href="<?= htmlspecialchars($img['file_path']) ?>" target="_blank" onclick="event.stopPropagation();" class="w-10 h-10 rounded-md overflow-hidden border border-slate-200 dark:border-slate-600 block">
                     <img src="<?= htmlspecialchars($img['file_path']) ?>" class="w-full h-full object-cover hover:scale-110 transition-transform">
                 </a>
             <?php endforeach; ?>
@@ -59,7 +59,7 @@
                     <!-- Tooltip with all URLs -->
                     <div class="absolute bottom-full right-0 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 invisible group-hover/urls:opacity-100 group-hover/urls:visible transition-all z-50 shadow-lg">
                         <?php foreach($t['urls'] as $url): ?>
-                            <a href="<?= htmlspecialchars($url['url']) ?>" target="_blank" class="block truncate hover:text-indigo-300 mb-1 last:mb-0">
+                            <a href="<?= htmlspecialchars($url['url']) ?>" target="_blank" onclick="event.stopPropagation();" class="block truncate hover:text-indigo-300 mb-1 last:mb-0">
                                 <?= htmlspecialchars($url['url']) ?>
                             </a>
                         <?php endforeach; ?>
@@ -95,4 +95,4 @@
             </select>
         </form>
     </div>
-</a>
+</div>
