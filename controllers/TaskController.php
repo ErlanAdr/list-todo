@@ -17,8 +17,7 @@ class TaskController {
 
     public function index() {
         $status_filter = isset($_GET['status']) && $_GET['status'] !== '' ? $_GET['status'] : null;
-        $stmt = $this->task->readAll($status_filter);
-        $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tasks = $this->task->readAll($status_filter);
         
         // Group tasks by status for a board view
         $board = [
@@ -41,7 +40,7 @@ class TaskController {
         $stmt_users = $this->user->readAll();
         $users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
         
-        $task = ['id'=>'', 'name'=>'', 'detail'=>'', 'assigned_to'=>'', 'url'=>'', 'status'=>'To Do', 'assignment_date'=>''];
+        $task = ['id'=>'', 'name'=>'', 'detail'=>'', 'assigned_to'=>'', 'status'=>'To Do', 'assignment_date'=>'', 'urls'=>[], 'images'=>[]];
         $is_edit = false;
 
         $content = __DIR__ . '/../views/tasks/form.php';
@@ -67,9 +66,10 @@ class TaskController {
             'name' => $this->task->name,
             'detail' => $this->task->detail,
             'assigned_to' => $this->task->assigned_to,
-            'url' => $this->task->url,
             'status' => $this->task->status,
-            'assignment_date' => $this->task->assignment_date
+            'assignment_date' => $this->task->assignment_date,
+            'urls' => $this->task->urls,
+            'images' => $this->task->images
         ];
         
         $stmt_users = $this->user->readAll();
@@ -92,9 +92,34 @@ class TaskController {
             $this->task->name = $_POST['name'];
             $this->task->detail = $_POST['detail'];
             $this->task->assigned_to = $_POST['assigned_to'];
-            $this->task->url = $_POST['url'];
             $this->task->status = $_POST['status'];
             $this->task->assignment_date = $_POST['assignment_date'];
+
+            // Handle URLs array
+            $this->task->urls = isset($_POST['urls']) && is_array($_POST['urls']) ? $_POST['urls'] : [];
+
+            // Handle Images Upload
+            $uploaded_images = [];
+            if(isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                $upload_dir = __DIR__ . '/../public/uploads/';
+                
+                for($i = 0; $i < count($_FILES['images']['name']); $i++) {
+                    $tmp_name = $_FILES['images']['tmp_name'][$i];
+                    $name = basename($_FILES['images']['name'][$i]);
+                    
+                    // Generate unique name
+                    $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                    $valid_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    
+                    if(in_array($ext, $valid_ext)) {
+                        $new_name = uniqid('task_') . '.' . $ext;
+                        if(move_uploaded_file($tmp_name, $upload_dir . $new_name)) {
+                            $uploaded_images[] = 'uploads/' . $new_name;
+                        }
+                    }
+                }
+            }
+            $this->task->images = $uploaded_images;
 
             if (isset($_POST['id']) && !empty($_POST['id'])) {
                 $this->task->id = $_POST['id'];

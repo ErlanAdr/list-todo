@@ -4,7 +4,25 @@ session_start();
 // Simple routing
 $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 
+// Auth Check
+if (!isset($_SESSION['user_id']) && $action !== 'login') {
+    header("Location: index.php?action=login");
+    exit;
+}
+
 switch ($action) {
+    case 'login':
+        require_once __DIR__ . '/../controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->login();
+        break;
+
+    case 'logout':
+        require_once __DIR__ . '/../controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->logout();
+        break;
+
     case 'index':
         require_once __DIR__ . '/../controllers/TaskController.php';
         $controller = new TaskController();
