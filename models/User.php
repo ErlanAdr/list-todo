@@ -16,7 +16,15 @@ class User {
     }
 
     public function readAll() {
-        $query = "SELECT id, username, name, role, created_at FROM " . $this->table_name . " ORDER BY name ASC";
+        $query = "SELECT id, username, name, role, created_at FROM " . $this->table_name . " ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Read only regular users (for assignment dropdown)
+    public function readRegularUsers() {
+        $query = "SELECT id, name FROM " . $this->table_name . " WHERE role != 'super_admin' ORDER BY name ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;

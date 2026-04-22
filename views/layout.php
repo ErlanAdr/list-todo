@@ -67,6 +67,12 @@
                         Users
                     </a>
                 </li>
+                <li>
+                    <a href="index.php?action=departments" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'departments') ? 'bg-indigo-600 hover:bg-indigo-700 border-l-4 border-indigo-400' : '' ?>">
+                        <i class="ph ph-buildings mr-3 text-lg"></i>
+                        Departments
+                    </a>
+                </li>
                 <?php endif; ?>
             </ul>
         </nav>
@@ -113,6 +119,12 @@
                     <a href="index.php?action=users" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'users') ? 'bg-indigo-600' : '' ?>">
                         <i class="ph ph-users mr-3 text-lg"></i>
                         Users
+                    </a>
+                </li>
+                <li>
+                    <a href="index.php?action=departments" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'departments') ? 'bg-indigo-600' : '' ?>">
+                        <i class="ph ph-buildings mr-3 text-lg"></i>
+                        Departments
                     </a>
                 </li>
                 <?php endif; ?>
@@ -181,6 +193,11 @@
 
                 <!-- Inject specific view content here -->
                 <?php require_once $content; ?>
+                
+                <!-- Footer -->
+                <div class="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500">
+                    Copyright 2026 Erlan Andriansyah/bxbxBxy
+                </div>
             </div>
         </div>
     </main>

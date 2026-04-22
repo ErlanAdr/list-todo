@@ -1,7 +1,22 @@
+<div class="max-w-2xl mx-auto mb-4 relative z-10">
+    <a href="index.php" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
+        <i class="ph ph-arrow-left"></i> Back to Board
+    </a>
+</div>
+
 <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors relative z-10">
-    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6">
-        <?= $is_edit ? 'Edit Task' : 'Create New Task' ?>
-    </h3>
+    <div class="flex items-start justify-between mb-6">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">
+            <?= $is_edit ? 'Task Details' : 'Create New Task' ?>
+        </h3>
+        
+        <?php if($is_edit && !empty($task['creator_name'])): ?>
+            <div class="text-right text-xs text-slate-400 dark:text-slate-500">
+                Created by:<br>
+                <span class="font-medium text-slate-600 dark:text-slate-300"><?= htmlspecialchars($task['creator_name']) ?></span>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <form action="index.php?action=task_store" method="POST" enctype="multipart/form-data" class="space-y-6">
         <?php if($is_edit): ?>
@@ -18,7 +33,7 @@
             <textarea name="detail" rows="4" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors" placeholder="Add more details..."><?= htmlspecialchars($task['detail']) ?></textarea>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Assign To</label>
                 <select name="assigned_to" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors">
@@ -26,6 +41,18 @@
                     <?php foreach($users as $u): ?>
                         <option value="<?= $u['id'] ?>" <?= $task['assigned_to'] == $u['id'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($u['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Department</label>
+                <select name="department_id" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors">
+                    <option value="">No Department</option>
+                    <?php foreach($departments as $d): ?>
+                        <option value="<?= $d['id'] ?>" <?= $task['department_id'] == $d['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($d['name']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -95,15 +122,30 @@
             </div>
         <?php endif; ?>
 
-        <div class="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors">
-                <?= $is_edit ? 'Update Task' : 'Save Task' ?>
-            </button>
-            <a href="index.php" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 font-medium py-2 px-4">
-                Cancel
-            </a>
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+            <div class="flex items-center gap-4">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors">
+                    <?= $is_edit ? 'Update Task' : 'Save Task' ?>
+                </button>
+                <a href="index.php" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 font-medium py-2 px-4">
+                    Cancel
+                </a>
+            </div>
+            
+            <?php if($is_edit): ?>
+                <!-- Delete is now inside the form as a secondary action -->
+                <button type="button" onclick="if(confirm('Are you sure you want to delete this task?')) document.getElementById('delete-form').submit();" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="ph ph-trash"></i> Delete Task
+                </button>
+            <?php endif; ?>
         </div>
     </form>
+    
+    <?php if($is_edit): ?>
+        <form id="delete-form" action="index.php?action=task_delete" method="POST" class="hidden">
+            <input type="hidden" name="id" value="<?= $task['id'] ?>">
+        </form>
+    <?php endif; ?>
 </div>
 
 <?php if($is_edit): ?>

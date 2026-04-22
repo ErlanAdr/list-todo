@@ -8,6 +8,8 @@ class Task {
     public $name;
     public $detail;
     public $assigned_to;
+    public $department_id;
+    public $created_by;
     public $status;
     public $assignment_date;
     public $created_at;
@@ -24,10 +26,13 @@ class Task {
 
     // Read tasks with user info and filters
     public function readAll($status_filter = null, $assignee_filter = null, $date_filter = null) {
-        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, u.name as assignee_name,
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, 
+                  u.name as assignee_name, d.name as department_name, creator.name as creator_name,
                   (SELECT COUNT(*) FROM task_comments tc WHERE tc.task_id = t.id) as comment_count
                   FROM " . $this->table_name . " t 
                   LEFT JOIN users u ON t.assigned_to = u.id 
+                  LEFT JOIN users creator ON t.created_by = creator.id
+                  LEFT JOIN departments d ON t.department_id = d.id
                   WHERE 1=1 ";
         
         $params = [];
@@ -68,9 +73,12 @@ class Task {
 
     // Read single task
     public function readOne() {
-        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, u.name as assignee_name 
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.department_id, t.created_by, t.status, t.assignment_date, t.created_at, 
+                  u.name as assignee_name, d.name as department_name, creator.name as creator_name 
                   FROM " . $this->table_name . " t 
                   LEFT JOIN users u ON t.assigned_to = u.id 
+                  LEFT JOIN users creator ON t.created_by = creator.id
+                  LEFT JOIN departments d ON t.department_id = d.id
                   WHERE t.id = ? LIMIT 0,1";
 
         $stmt = $this->conn->prepare($query);
@@ -82,8 +90,14 @@ class Task {
             $this->name = $row['name'];
             $this->detail = $row['detail'];
             $this->assigned_to = $row['assigned_to'];
+            $this->department_id = $row['department_id'];
+            $this->created_by = $row['created_by'];
             $this->status = $row['status'];
             $this->assignment_date = $row['assignment_date'];
+            
+            // Add custom properties not originally in class definition but useful for view
+            $this->creator_name = $row['creator_name'];
+            $this->department_name = $row['department_name'];
             
             $this->urls = $this->getUrls($this->id);
             $this->images = $this->getImages($this->id);
@@ -94,7 +108,7 @@ class Task {
     // Create task
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " 
-                  SET name=:name, detail=:detail, assigned_to=:assigned_to, status=:status, assignment_date=:assignment_date";
+                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, created_by=:created_by, status=:status, assignment_date=:assignment_date";
 
         $stmt = $this->conn->prepare($query);
 
@@ -102,6 +116,8 @@ class Task {
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->detail = htmlspecialchars(strip_tags($this->detail));
         $this->assigned_to = !empty($this->assigned_to) ? htmlspecialchars(strip_tags($this->assigned_to)) : null;
+        $this->department_id = !empty($this->department_id) ? htmlspecialchars(strip_tags($this->department_id)) : null;
+        $this->created_by = htmlspecialchars(strip_tags($this->created_by));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->assignment_date = !empty($this->assignment_date) ? htmlspecialchars(strip_tags($this->assignment_date)) : null;
 
@@ -109,6 +125,8 @@ class Task {
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":detail", $this->detail);
         $stmt->bindParam(":assigned_to", $this->assigned_to);
+        $stmt->bindParam(":department_id", $this->department_id);
+        $stmt->bindParam(":created_by", $this->created_by);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":assignment_date", $this->assignment_date);
 
@@ -124,7 +142,7 @@ class Task {
     // Update task
     public function update() {
         $query = "UPDATE " . $this->table_name . " 
-                  SET name=:name, detail=:detail, assigned_to=:assigned_to, status=:status, assignment_date=:assignment_date 
+                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, status=:status, assignment_date=:assignment_date 
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
@@ -133,6 +151,7 @@ class Task {
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->detail = htmlspecialchars(strip_tags($this->detail));
         $this->assigned_to = !empty($this->assigned_to) ? htmlspecialchars(strip_tags($this->assigned_to)) : null;
+        $this->department_id = !empty($this->department_id) ? htmlspecialchars(strip_tags($this->department_id)) : null;
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->assignment_date = !empty($this->assignment_date) ? htmlspecialchars(strip_tags($this->assignment_date)) : null;
         $this->id = htmlspecialchars(strip_tags($this->id));
@@ -141,6 +160,7 @@ class Task {
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":detail", $this->detail);
         $stmt->bindParam(":assigned_to", $this->assigned_to);
+        $stmt->bindParam(":department_id", $this->department_id);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":assignment_date", $this->assignment_date);
         $stmt->bindParam(":id", $this->id);
@@ -148,7 +168,7 @@ class Task {
         if($stmt->execute()) {
             $this->conn->exec("DELETE FROM task_urls WHERE task_id = " . $this->id);
             $this->saveUrls();
-            $this->saveImages();
+            $this->saveImages(); // Add images will just append. We should probably clear them if we had a full management system, but we'll leave it as additive for now.
             return true;
         }
         return false;

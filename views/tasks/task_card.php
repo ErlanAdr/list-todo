@@ -1,20 +1,14 @@
-<div class="task-card bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10">
+<a href="index.php?action=task_edit&id=<?= $t['id'] ?>" class="task-card block bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10 border-l-4 border-l-transparent hover:border-l-indigo-500">
     
-    <!-- Actions Menu (hidden by default, shown on hover) -->
-    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-600 z-20">
-        <a href="index.php?action=task_edit&id=<?= $t['id'] ?>" class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-1" title="Edit">
-            <i class="ph ph-pencil-simple"></i>
-        </a>
-        <form action="index.php?action=task_delete" method="POST" onsubmit="return confirm('Delete this task?');" class="inline">
-            <input type="hidden" name="id" value="<?= $t['id'] ?>">
-            <button type="submit" class="text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-1" title="Delete">
-                <i class="ph ph-trash"></i>
-            </button>
-        </form>
+    <!-- Header: Title & Department -->
+    <div class="flex items-start justify-between gap-2">
+        <h4 class="font-medium text-slate-800 dark:text-slate-100 task-title"><?= htmlspecialchars($t['name']) ?></h4>
+        <?php if(!empty($t['department_name'])): ?>
+            <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold rounded-md shrink-0">
+                <?= htmlspecialchars($t['department_name']) ?>
+            </span>
+        <?php endif; ?>
     </div>
-
-    <!-- Title -->
-    <h4 class="font-medium text-slate-800 dark:text-slate-100 task-title pr-12"><?= htmlspecialchars($t['name']) ?></h4>
     
     <!-- Detail Snippet -->
     <?php if(!empty($t['detail'])): ?>
@@ -91,8 +85,8 @@
     </div>
     
     <!-- Quick Status Update -->
-    <div class="mt-2 text-xs flex justify-end">
-        <form action="index.php?action=task_update_status" method="POST" class="inline w-full text-right">
+    <div class="mt-2 text-xs flex justify-end relative z-20">
+        <form action="index.php?action=task_update_status" method="POST" class="inline w-full text-right" onclick="event.preventDefault(); event.stopPropagation();">
             <input type="hidden" name="id" value="<?= $t['id'] ?>">
             <select name="status" onchange="this.form.submit()" class="bg-transparent border-none text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer focus:ring-0 py-0 pl-0 pr-6 text-xs text-right appearance-none" style="background-position: right 0.2rem center;">
                 <option value="To Do" <?= $t['status'] == 'To Do' ? 'selected' : '' ?>>To Do</option>
@@ -101,4 +95,4 @@
             </select>
         </form>
     </div>
-</div>
+</a>

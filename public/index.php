@@ -65,6 +65,24 @@ switch ($action) {
         $controller->add_comment();
         break;
 
+    case 'departments':
+        require_once __DIR__ . '/../controllers/DepartmentController.php';
+        $controller = new DepartmentController();
+        $controller->index();
+        break;
+
+    case 'department_create':
+        require_once __DIR__ . '/../controllers/DepartmentController.php';
+        $controller = new DepartmentController();
+        $controller->create();
+        break;
+
+    case 'department_delete':
+        require_once __DIR__ . '/../controllers/DepartmentController.php';
+        $controller = new DepartmentController();
+        $controller->delete();
+        break;
+
     case 'users':
         require_once __DIR__ . '/../controllers/UserController.php';
         $controller = new UserController();
