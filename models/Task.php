@@ -100,6 +100,7 @@ class Task {
             // Add custom properties not originally in class definition but useful for view
             $this->creator_name = $row['creator_name'];
             $this->department_name = $row['department_name'];
+            $this->assignee_name = $row['assignee_name'];
             
             $this->urls = $this->getUrls($this->id);
             $this->images = $this->getImages($this->id);

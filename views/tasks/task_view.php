@@ -80,11 +80,11 @@
     <!-- Detail Content Area -->
     <div class="p-8 space-y-8">
         <?php if (!empty($task['detail'])): ?>
-        <div>
-            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-wider">
-                <i class="ph ph-text-align-left text-slate-400"></i> Description
+        <div class="bg-slate-50 dark:bg-slate-900/40 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+            <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                <i class="ph ph-text-align-left text-lg"></i> Description
             </h4>
-            <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 whitespace-pre-wrap text-sm leading-relaxed bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+            <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 whitespace-pre-wrap text-[15px] leading-relaxed">
                 <?= htmlspecialchars($task['detail']) ?>
             </div>
         </div>
