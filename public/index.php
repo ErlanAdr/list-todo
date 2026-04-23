@@ -5,7 +5,7 @@ session_start();
 $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 
 // Auth Check
-if (!isset($_SESSION['user_id']) && $action !== 'login') {
+if (!isset($_SESSION['user_id']) && $action !== 'login' && $action !== 'guest_login') {
     header("Location: index.php?action=login");
     exit;
 }
@@ -15,6 +15,18 @@ switch ($action) {
         require_once __DIR__ . '/../controllers/AuthController.php';
         $controller = new AuthController();
         $controller->login();
+        break;
+
+    case 'login_submit':
+        require_once __DIR__ . '/../controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->login_submit();
+        break;
+
+    case 'guest_login':
+        require_once __DIR__ . '/../controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->guest_login();
         break;
 
     case 'logout':
@@ -33,6 +45,12 @@ switch ($action) {
         require_once __DIR__ . '/../controllers/TaskController.php';
         $controller = new TaskController();
         $controller->create();
+        break;
+
+    case 'task_view':
+        require_once __DIR__ . '/../controllers/TaskController.php';
+        $controller = new TaskController();
+        $controller->view();
         break;
 
     case 'task_edit':

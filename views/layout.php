@@ -110,11 +110,11 @@
             <ul class="space-y-1">
                 <li>
                     <a href="index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (!isset($_GET['action']) || $_GET['action'] == 'index') ? 'bg-indigo-600' : '' ?>">
-                        <i class="ph ph-squares-four mr-3 text-lg"></i>
+                        <i class="ph ph-kanban mr-3 text-lg"></i>
                         Board
                     </a>
                 </li>
-                <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'super_admin'): ?>
+                <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest' && $_SESSION['user_role'] === 'super_admin'): ?>
                 <li>
                     <a href="index.php?action=users" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'users') ? 'bg-indigo-600' : '' ?>">
                         <i class="ph ph-users mr-3 text-lg"></i>

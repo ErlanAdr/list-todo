@@ -24,7 +24,7 @@ class AuthController {
                 header("Location: index.php");
                 exit;
             } else {
-                $_SESSION['message'] = "Invalid username or password.";
+                $_SESSION['message'] = "Invalid credentials";
                 $_SESSION['msg_type'] = "error";
                 header("Location: index.php?action=login");
                 exit;
@@ -32,6 +32,16 @@ class AuthController {
         } else {
             require __DIR__ . '/../views/auth/login.php';
         }
+    }
+
+    public function guest_login() {
+        $_SESSION['user_id'] = 0;
+        $_SESSION['user_name'] = 'Guest';
+        $_SESSION['user_role'] = 'guest';
+        $_SESSION['message'] = "Welcome, Guest! You are in view-only mode.";
+        $_SESSION['msg_type'] = "success";
+        header("Location: index.php");
+        exit;
     }
 
     public function logout() {

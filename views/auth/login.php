@@ -63,6 +63,18 @@
                 Sign In
             </button>
         </form>
+            
+        <div class="mt-6 flex items-center justify-between">
+            <span class="border-b dark:border-slate-600 w-1/5 md:w-1/4"></span>
+            <span class="text-xs text-slate-500 dark:text-slate-400 uppercase">Or</span>
+            <span class="border-b dark:border-slate-600 w-1/5 md:w-1/4"></span>
+        </div>
+        
+        <div class="mt-6">
+            <a href="index.php?action=guest_login" class="w-full flex justify-center items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200 font-medium py-2 px-4 rounded-lg shadow-sm transition-colors text-sm">
+                <i class="ph ph-user"></i> Login as Guest (View Only)
+            </a>
+        </div>
     </div>
 
     <!-- Minimal physics script for the background fidget -->

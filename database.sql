@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     assigned_to INT NULL,
     department_id INT NULL,
     created_by INT NOT NULL,
-    status ENUM('To Do', 'In Progress', 'Done') DEFAULT 'To Do',
+    status ENUM('To Do', 'In Progress', 'Perlu Direview', 'Perlu Direvisi', 'Sudah Approve') DEFAULT 'To Do',
     assignment_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,

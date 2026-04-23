@@ -40,6 +40,9 @@ class TaskController {
         foreach ($tasks as $t) {
             if (array_key_exists($t['status'], $board)) {
                 $board[$t['status']][] = $t;
+            } else {
+                // If the status is one of the new ones and missing, initialize it
+                $board[$t['status']] = [$t];
             }
         }
 
@@ -47,7 +50,18 @@ class TaskController {
         require __DIR__ . '/../views/layout.php';
     }
 
+    private function restrictGuest() {
+        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'guest') {
+            $_SESSION['message'] = "Guest users cannot perform this action.";
+            $_SESSION['msg_type'] = "error";
+            header("Location: index.php");
+            exit;
+        }
+    }
+
     public function create() {
+        $this->restrictGuest();
+        
         $stmt_users = $this->user->readRegularUsers(); // Exclude super_admin
         $users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
         
@@ -61,7 +75,44 @@ class TaskController {
         require __DIR__ . '/../views/layout.php';
     }
 
+    public function view() {
+        if (!isset($_GET['id'])) {
+            header("Location: index.php");
+            exit;
+        }
+
+        $this->task->id = $_GET['id'];
+        $this->task->readOne();
+
+        if (empty($this->task->name)) {
+            header("Location: index.php");
+            exit;
+        }
+
+        $task = [
+            'id' => $this->task->id,
+            'name' => $this->task->name,
+            'detail' => $this->task->detail,
+            'assigned_to' => $this->task->assigned_to,
+            'department_id' => $this->task->department_id,
+            'status' => $this->task->status,
+            'assignment_date' => $this->task->assignment_date,
+            'urls' => $this->task->urls,
+            'images' => $this->task->images,
+            'comments' => $this->task->comments,
+            'created_by' => $this->task->created_by,
+            'creator_name' => $this->task->creator_name,
+            'department_name' => $this->task->department_name,
+            'assignee_name' => $this->task->assignee_name
+        ];
+
+        $content = __DIR__ . '/../views/tasks/task_view.php';
+        require __DIR__ . '/../views/layout.php';
+    }
+
     public function edit() {
+        $this->restrictGuest();
+        
         if (!isset($_GET['id'])) {
             header("Location: index.php");
             exit;
@@ -103,6 +154,8 @@ class TaskController {
     }
 
     public function store() {
+        $this->restrictGuest();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($_POST['name'])) {
                 $_SESSION['message'] = "Task name is required.";
@@ -213,6 +266,8 @@ class TaskController {
     }
 
     public function delete() {
+        $this->restrictGuest();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             $this->task->id = $_POST['id'];
             if ($this->task->delete()) {
@@ -228,6 +283,8 @@ class TaskController {
     }
     
     public function update_status() {
+        $this->restrictGuest();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id']) && isset($_POST['status'])) {
             $this->task->id = $_POST['id'];
             $this->task->status = $_POST['status'];
@@ -245,6 +302,8 @@ class TaskController {
     }
     
     public function add_comment() {
+        $this->restrictGuest();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id']) && !empty($_POST['comment'])) {
             $this->task->id = $_POST['task_id'];
             if ($this->task->addComment($_SESSION['user_id'], $_POST['comment'])) {

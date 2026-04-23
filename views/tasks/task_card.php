@@ -1,4 +1,4 @@
-<div onclick="window.location.href='index.php?action=task_edit&id=<?= $t['id'] ?>'" class="task-card block bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10 border-l-4 border-l-transparent hover:border-l-indigo-500">
+<div onclick="window.location.href='index.php?action=task_view&id=<?= $t['id'] ?>'" class="task-card block bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 group relative z-10 border-l-4 border-l-transparent hover:border-l-indigo-500">
     
     <!-- Header: Title & Department -->
     <div class="flex items-start justify-between gap-2">
@@ -84,15 +84,23 @@
         </div>
     </div>
     
-    <!-- Quick Status Update -->
+    <!-- Quick Status Update (Hidden for guest) -->
+    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest'): ?>
     <div class="mt-2 text-xs flex justify-end relative z-20">
         <form action="index.php?action=task_update_status" method="POST" class="inline w-full text-right" onclick="event.preventDefault(); event.stopPropagation();">
             <input type="hidden" name="id" value="<?= $t['id'] ?>">
             <select name="status" onchange="this.form.submit()" class="bg-transparent border-none text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer focus:ring-0 py-0 pl-0 pr-6 text-xs text-right appearance-none" style="background-position: right 0.2rem center;">
                 <option value="To Do" <?= $t['status'] == 'To Do' ? 'selected' : '' ?>>To Do</option>
                 <option value="In Progress" <?= $t['status'] == 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                <option value="Done" <?= $t['status'] == 'Done' ? 'selected' : '' ?>>Done</option>
+                <option value="Perlu Direview" <?= $t['status'] == 'Perlu Direview' ? 'selected' : '' ?>>Perlu Direview</option>
+                <option value="Perlu Direvisi" <?= $t['status'] == 'Perlu Direvisi' ? 'selected' : '' ?>>Perlu Direvisi</option>
+                <option value="Sudah Approve" <?= $t['status'] == 'Sudah Approve' ? 'selected' : '' ?>>Sudah Approve</option>
             </select>
         </form>
     </div>
+    <?php else: ?>
+    <div class="mt-2 text-xs flex justify-end">
+        <span class="text-slate-400 dark:text-slate-500 font-medium"><?= htmlspecialchars($t['status']) ?></span>
+    </div>
+    <?php endif; ?>
 </div>

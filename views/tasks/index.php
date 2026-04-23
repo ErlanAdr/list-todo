@@ -1,123 +1,162 @@
-<div class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors relative z-10">
-    <form action="index.php" method="GET" class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <input type="hidden" name="action" value="index">
+<div class="mb-6 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <i class="ph ph-kanban text-indigo-500"></i> Board
+    </h2>
+    
+    <!-- Filter Bar -->
+    <form action="index.php" method="GET" class="flex flex-wrap items-center gap-3 w-full md:w-auto bg-white dark:bg-slate-800 p-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <div class="flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+            <i class="ph ph-users text-slate-400 mr-2"></i>
+            <select name="assigned_to" class="bg-transparent border-none text-sm text-slate-600 dark:text-slate-300 focus:ring-0 cursor-pointer w-full" onchange="this.form.submit()">
+                <option value="">All Assignees</option>
+                <?php foreach($users as $u): ?>
+                    <option value="<?= $u['id'] ?>" <?= (isset($_GET['assigned_to']) && $_GET['assigned_to'] == $u['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($u['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
         
-        <!-- Search & Filter Controls -->
-        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            <!-- Client-side text search -->
-            <div class="relative w-full md:w-64">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="ph ph-magnifying-glass text-gray-400"></i>
-                </div>
-                <input type="text" id="searchInput" onkeyup="filterTasks()" placeholder="Search tasks..." class="pl-10 w-full border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 border transition-colors">
-            </div>
-
-            <!-- Server-side filters -->
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <select name="assigned_to" onchange="this.form.submit()" class="w-full md:w-auto border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 pl-3 pr-8 border transition-colors text-sm">
-                    <option value="">All Users</option>
-                    <?php foreach($users as $u): ?>
-                        <option value="<?= $u['id'] ?>" <?= isset($_GET['assigned_to']) && $_GET['assigned_to'] == $u['id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($u['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-
-                <input type="date" name="date" value="<?= isset($_GET['date']) ? htmlspecialchars($_GET['date']) : '' ?>" onchange="this.form.submit()" class="w-full md:w-auto border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors text-sm">
-                
-                <?php if(!empty($_GET['assigned_to']) || !empty($_GET['date'])): ?>
-                    <a href="index.php" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg transition-colors" title="Clear Filters">
-                        <i class="ph ph-x"></i>
-                    </a>
-                <?php endif; ?>
-            </div>
+        <div class="flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+            <i class="ph ph-calendar-blank text-slate-400 mr-2"></i>
+            <input type="date" name="date" value="<?= isset($_GET['date']) ? htmlspecialchars($_GET['date']) : '' ?>" class="bg-transparent border-none text-sm text-slate-600 dark:text-slate-300 focus:ring-0 cursor-pointer w-full" onchange="this.form.submit()">
+        </div>
+        
+        <?php if((isset($_GET['assigned_to']) && $_GET['assigned_to'] !== '') || (isset($_GET['date']) && $_GET['date'] !== '')): ?>
+            <a href="index.php" class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Clear Filters">
+                <i class="ph ph-x-circle text-lg"></i>
+            </a>
+        <?php endif; ?>
+        
+        <div class="flex items-center gap-3 ml-auto">
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest'): ?>
+            <a href="index.php?action=task_create" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap">
+                <i class="ph ph-plus-circle text-lg"></i>
+                <span class="hidden sm:inline">New Task</span>
+            </a>
+            <?php endif; ?>
         </div>
     </form>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full items-start relative z-10">
+<!-- Board Columns (5 Columns with Horizontal Scroll) -->
+<div class="flex flex-nowrap overflow-x-auto gap-6 pb-6 pt-2 snap-x hide-scrollbar relative z-10 min-h-[60vh]">
     
-    <!-- To Do Column -->
-    <div class="bg-slate-100 dark:bg-slate-800/50 rounded-xl p-4 min-h-[500px] border border-slate-200 dark:border-slate-700 transition-colors">
-        <h3 class="font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center justify-between">
-            <span class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                To Do
+    <!-- TO DO Column -->
+    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-slate-400">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> To Do
+            </h3>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                <?= count($board['To Do'] ?? []) ?>
             </span>
-            <span class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold px-2 py-1 rounded-full"><?= count($board['To Do']) ?></span>
-        </h3>
-        
-        <div class="space-y-3 task-list">
-            <?php foreach($board['To Do'] as $t): ?>
-                <?php include 'task_card.php'; ?>
-            <?php endforeach; ?>
-            <?php if(empty($board['To Do'])): ?>
-                <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center text-slate-400 dark:text-slate-500 text-sm">
-                    No tasks here
-                </div>
-            <?php endif; ?>
+        </div>
+        <div class="space-y-4">
+            <?php 
+            if(empty($board['To Do'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['To Do'] ?? []) as $t) {
+                require 'task_card.php';
+            }
+            ?>
         </div>
     </div>
 
-    <!-- In Progress Column -->
-    <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 min-h-[500px] border border-indigo-100 dark:border-indigo-800/30 transition-colors">
-        <h3 class="font-semibold text-indigo-900 dark:text-indigo-300 mb-4 flex items-center justify-between">
-            <span class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                In Progress
+    <!-- IN PROGRESS Column -->
+    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-indigo-500">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> In Progress
+            </h3>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                <?= count($board['In Progress'] ?? []) ?>
             </span>
-            <span class="bg-indigo-200 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-xs font-bold px-2 py-1 rounded-full"><?= count($board['In Progress']) ?></span>
-        </h3>
-        
-        <div class="space-y-3 task-list">
-            <?php foreach($board['In Progress'] as $t): ?>
-                <?php include 'task_card.php'; ?>
-            <?php endforeach; ?>
-            <?php if(empty($board['In Progress'])): ?>
-                <div class="border-2 border-dashed border-indigo-200 dark:border-indigo-800/50 rounded-lg p-6 text-center text-indigo-400 dark:text-indigo-500 text-sm">
-                    No tasks here
-                </div>
-            <?php endif; ?>
+        </div>
+        <div class="space-y-4">
+            <?php 
+            if(empty($board['In Progress'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['In Progress'] ?? []) as $t) {
+                require 'task_card.php';
+            }
+            ?>
+        </div>
+    </div>
+    
+    <!-- PERLU DIREVIEW Column -->
+    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-purple-500">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Perlu Direview
+            </h3>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                <?= count($board['Perlu Direview'] ?? []) ?>
+            </span>
+        </div>
+        <div class="space-y-4">
+            <?php 
+            if(empty($board['Perlu Direview'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['Perlu Direview'] ?? []) as $t) {
+                require 'task_card.php';
+            }
+            ?>
+        </div>
+    </div>
+    
+    <!-- PERLU DIREVISI Column -->
+    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-amber-500">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Perlu Direvisi
+            </h3>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                <?= count($board['Perlu Direvisi'] ?? []) ?>
+            </span>
+        </div>
+        <div class="space-y-4">
+            <?php 
+            if(empty($board['Perlu Direvisi'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['Perlu Direvisi'] ?? []) as $t) {
+                require 'task_card.php';
+            }
+            ?>
         </div>
     </div>
 
-    <!-- Done Column -->
-    <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 min-h-[500px] border border-green-100 dark:border-green-800/30 transition-colors">
-        <h3 class="font-semibold text-green-900 dark:text-green-300 mb-4 flex items-center justify-between">
-            <span class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                Done
+    <!-- SUDAH APPROVE Column -->
+    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-emerald-500">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Sudah Approve
+            </h3>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                <?= count($board['Sudah Approve'] ?? []) ?>
             </span>
-            <span class="bg-green-200 dark:bg-green-900/50 text-green-700 dark:text-green-400 text-xs font-bold px-2 py-1 rounded-full"><?= count($board['Done']) ?></span>
-        </h3>
-        
-        <div class="space-y-3 task-list">
-            <?php foreach($board['Done'] as $t): ?>
-                <?php include 'task_card.php'; ?>
-            <?php endforeach; ?>
-            <?php if(empty($board['Done'])): ?>
-                <div class="border-2 border-dashed border-green-200 dark:border-green-800/50 rounded-lg p-6 text-center text-green-400 dark:text-green-500 text-sm">
-                    No tasks here
-                </div>
-            <?php endif; ?>
+        </div>
+        <div class="space-y-4">
+            <?php 
+            if(empty($board['Sudah Approve'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['Sudah Approve'] ?? []) as $t) {
+                require 'task_card.php';
+            }
+            ?>
         </div>
     </div>
+
 </div>
 
-<script>
-    function filterTasks() {
-        let input = document.getElementById('searchInput');
-        let filter = input.value.toLowerCase();
-        let cards = document.querySelectorAll('.task-card');
-
-        cards.forEach(function(card) {
-            let title = card.querySelector('.task-title').innerText.toLowerCase();
-            let assignee = card.querySelector('.task-assignee') ? card.querySelector('.task-assignee').innerText.toLowerCase() : '';
-            if (title.indexOf(filter) > -1 || assignee.indexOf(filter) > -1) {
-                card.style.display = "";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    }
-</script>
+<style>
+/* Custom scrollbar for horizontal board */
+.hide-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.hide-scrollbar::-webkit-scrollbar-track {
+    background: transparent; 
+}
+.hide-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3); 
+    border-radius: 10px;
+}
+.hide-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.5); 
+}
+</style>
