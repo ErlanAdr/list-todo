@@ -39,16 +39,16 @@
     </form>
 </div>
 
-<!-- Board Columns (5 Columns with Horizontal Scroll) -->
-<div class="flex flex-nowrap overflow-x-auto gap-6 pb-6 pt-2 snap-x hide-scrollbar relative z-10 min-h-[60vh]">
+<!-- Board Columns (3 Columns) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10 min-h-[60vh]">
     
     <!-- TO DO Column -->
-    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-slate-400">
+    <div class="bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-slate-400">
         <div class="flex items-center justify-between mb-4 px-2">
             <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> To Do
             </h3>
-            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm border border-slate-200 dark:border-slate-700">
                 <?= count($board['To Do'] ?? []) ?>
             </span>
         </div>
@@ -63,12 +63,12 @@
     </div>
 
     <!-- IN PROGRESS Column -->
-    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-indigo-500">
+    <div class="bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-indigo-500">
         <div class="flex items-center justify-between mb-4 px-2">
             <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> In Progress
             </h3>
-            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm border border-slate-200 dark:border-slate-700">
                 <?= count($board['In Progress'] ?? []) ?>
             </span>
         </div>
@@ -81,61 +81,21 @@
             ?>
         </div>
     </div>
-    
-    <!-- PERLU DIREVIEW Column -->
-    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-purple-500">
-        <div class="flex items-center justify-between mb-4 px-2">
-            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Perlu Direview
-            </h3>
-            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                <?= count($board['Perlu Direview'] ?? []) ?>
-            </span>
-        </div>
-        <div class="space-y-4">
-            <?php 
-            if(empty($board['Perlu Direview'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
-            foreach(($board['Perlu Direview'] ?? []) as $t) {
-                require 'task_card.php';
-            }
-            ?>
-        </div>
-    </div>
-    
-    <!-- PERLU DIREVISI Column -->
-    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-amber-500">
-        <div class="flex items-center justify-between mb-4 px-2">
-            <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Perlu Direvisi
-            </h3>
-            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                <?= count($board['Perlu Direvisi'] ?? []) ?>
-            </span>
-        </div>
-        <div class="space-y-4">
-            <?php 
-            if(empty($board['Perlu Direvisi'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
-            foreach(($board['Perlu Direvisi'] ?? []) as $t) {
-                require 'task_card.php';
-            }
-            ?>
-        </div>
-    </div>
 
-    <!-- SUDAH APPROVE Column -->
-    <div class="min-w-[320px] w-[320px] shrink-0 snap-start bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-emerald-500">
+    <!-- DONE Column -->
+    <div class="bg-slate-50/80 dark:bg-slate-900/40 rounded-2xl p-4 border-t-4 border-emerald-500">
         <div class="flex items-center justify-between mb-4 px-2">
             <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Sudah Approve
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Done
             </h3>
-            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                <?= count($board['Sudah Approve'] ?? []) ?>
+            <span class="bg-white dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md shadow-sm border border-slate-200 dark:border-slate-700">
+                <?= count($board['Done'] ?? []) ?>
             </span>
         </div>
         <div class="space-y-4">
             <?php 
-            if(empty($board['Sudah Approve'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
-            foreach(($board['Sudah Approve'] ?? []) as $t) {
+            if(empty($board['Done'])) echo '<div class="text-center py-8 text-sm text-slate-400 dark:text-slate-600 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl">No tasks yet</div>';
+            foreach(($board['Done'] ?? []) as $t) {
                 require 'task_card.php';
             }
             ?>
@@ -143,20 +103,3 @@
     </div>
 
 </div>
-
-<style>
-/* Custom scrollbar for horizontal board */
-.hide-scrollbar::-webkit-scrollbar {
-    height: 8px;
-}
-.hide-scrollbar::-webkit-scrollbar-track {
-    background: transparent; 
-}
-.hide-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(156, 163, 175, 0.3); 
-    border-radius: 10px;
-}
-.hide-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(156, 163, 175, 0.5); 
-}
-</style>

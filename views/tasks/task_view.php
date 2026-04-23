@@ -19,16 +19,27 @@
             </h1>
             
             <div class="flex flex-col items-end gap-2 shrink-0">
+                <!-- Board Status -->
                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
                     <?php 
                         if ($task['status'] === 'To Do') echo 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
                         elseif ($task['status'] === 'In Progress') echo 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300';
-                        elseif ($task['status'] === 'Perlu Direview') echo 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300';
-                        elseif ($task['status'] === 'Perlu Direvisi') echo 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300';
                         else echo 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300';
                     ?>">
-                    <?= htmlspecialchars($task['status']) ?>
+                    <i class="ph ph-kanban"></i> <?= htmlspecialchars($task['status']) ?>
                 </span>
+                
+                <!-- Review Status -->
+                <?php if (isset($task['review_status']) && $task['review_status'] !== 'None'): ?>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border
+                    <?php 
+                        if ($task['review_status'] === 'Perlu Direview') echo 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 border-purple-200 dark:border-purple-700/50';
+                        elseif ($task['review_status'] === 'Perlu Direvisi') echo 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border-amber-200 dark:border-amber-700/50';
+                        elseif ($task['review_status'] === 'Sudah Approve') echo 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700/50';
+                    ?>">
+                    <i class="ph ph-tag"></i> <?= htmlspecialchars($task['review_status']) ?>
+                </span>
+                <?php endif; ?>
                 
                 <?php if (!empty($task['department_name'])): ?>
                     <span class="text-xs font-medium text-slate-500 flex items-center gap-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 px-2 py-0.5 rounded">

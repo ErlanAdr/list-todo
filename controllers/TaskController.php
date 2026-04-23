@@ -96,6 +96,7 @@ class TaskController {
             'assigned_to' => $this->task->assigned_to,
             'department_id' => $this->task->department_id,
             'status' => $this->task->status,
+            'review_status' => $this->task->review_status,
             'assignment_date' => $this->task->assignment_date,
             'urls' => $this->task->urls,
             'images' => $this->task->images,
@@ -133,6 +134,7 @@ class TaskController {
             'assigned_to' => $this->task->assigned_to,
             'department_id' => $this->task->department_id,
             'status' => $this->task->status,
+            'review_status' => $this->task->review_status,
             'assignment_date' => $this->task->assignment_date,
             'urls' => $this->task->urls,
             'images' => $this->task->images,
@@ -169,6 +171,7 @@ class TaskController {
             $this->task->assigned_to = $_POST['assigned_to'];
             $this->task->department_id = $_POST['department_id'];
             $this->task->status = $_POST['status'];
+            $this->task->review_status = isset($_POST['review_status']) ? $_POST['review_status'] : 'None';
             $this->task->assignment_date = $_POST['assignment_date'];
 
             // Handle URLs array
@@ -294,6 +297,25 @@ class TaskController {
                 $_SESSION['msg_type'] = "success";
             } else {
                  $_SESSION['message'] = "Failed to update status.";
+                 $_SESSION['msg_type'] = "error";
+            }
+        }
+        header("Location: index.php");
+        exit;
+    }
+
+    public function update_review_status() {
+        $this->restrictGuest();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id']) && isset($_POST['review_status'])) {
+            $this->task->id = $_POST['id'];
+            $this->task->review_status = $_POST['review_status'];
+            
+            if ($this->task->updateReviewStatusOnly()) {
+                $_SESSION['message'] = "Review status updated!";
+                $_SESSION['msg_type'] = "success";
+            } else {
+                 $_SESSION['message'] = "Failed to update review status.";
                  $_SESSION['msg_type'] = "error";
             }
         }

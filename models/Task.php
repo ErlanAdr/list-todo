@@ -11,6 +11,7 @@ class Task {
     public $department_id;
     public $created_by;
     public $status;
+    public $review_status;
     public $assignment_date;
     public $created_at;
     
@@ -26,7 +27,7 @@ class Task {
 
     // Read tasks with user info and filters
     public function readAll($status_filter = null, $assignee_filter = null, $date_filter = null) {
-        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.assignment_date, t.created_at, 
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.review_status, t.assignment_date, t.created_at, 
                   u.name as assignee_name, d.name as department_name, creator.name as creator_name,
                   (SELECT COUNT(*) FROM task_comments tc WHERE tc.task_id = t.id) as comment_count
                   FROM " . $this->table_name . " t 
@@ -73,7 +74,7 @@ class Task {
 
     // Read single task
     public function readOne() {
-        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.department_id, t.created_by, t.status, t.assignment_date, t.created_at, 
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.department_id, t.created_by, t.status, t.review_status, t.assignment_date, t.created_at, 
                   u.name as assignee_name, d.name as department_name, creator.name as creator_name 
                   FROM " . $this->table_name . " t 
                   LEFT JOIN users u ON t.assigned_to = u.id 
@@ -93,6 +94,7 @@ class Task {
             $this->department_id = $row['department_id'];
             $this->created_by = $row['created_by'];
             $this->status = $row['status'];
+            $this->review_status = $row['review_status'];
             $this->assignment_date = $row['assignment_date'];
             
             // Add custom properties not originally in class definition but useful for view
@@ -108,7 +110,7 @@ class Task {
     // Create task
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " 
-                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, created_by=:created_by, status=:status, assignment_date=:assignment_date";
+                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, created_by=:created_by, status=:status, review_status=:review_status, assignment_date=:assignment_date";
 
         $stmt = $this->conn->prepare($query);
 
@@ -119,6 +121,7 @@ class Task {
         $this->department_id = !empty($this->department_id) ? htmlspecialchars(strip_tags($this->department_id)) : null;
         $this->created_by = htmlspecialchars(strip_tags($this->created_by));
         $this->status = htmlspecialchars(strip_tags($this->status));
+        $this->review_status = !empty($this->review_status) ? htmlspecialchars(strip_tags($this->review_status)) : 'None';
         $this->assignment_date = !empty($this->assignment_date) ? htmlspecialchars(strip_tags($this->assignment_date)) : null;
 
         // Bind parameters
@@ -128,6 +131,7 @@ class Task {
         $stmt->bindParam(":department_id", $this->department_id);
         $stmt->bindParam(":created_by", $this->created_by);
         $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":review_status", $this->review_status);
         $stmt->bindParam(":assignment_date", $this->assignment_date);
 
         if($stmt->execute()) {
@@ -142,7 +146,7 @@ class Task {
     // Update task
     public function update() {
         $query = "UPDATE " . $this->table_name . " 
-                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, status=:status, assignment_date=:assignment_date 
+                  SET name=:name, detail=:detail, assigned_to=:assigned_to, department_id=:department_id, status=:status, review_status=:review_status, assignment_date=:assignment_date 
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
@@ -153,6 +157,7 @@ class Task {
         $this->assigned_to = !empty($this->assigned_to) ? htmlspecialchars(strip_tags($this->assigned_to)) : null;
         $this->department_id = !empty($this->department_id) ? htmlspecialchars(strip_tags($this->department_id)) : null;
         $this->status = htmlspecialchars(strip_tags($this->status));
+        $this->review_status = !empty($this->review_status) ? htmlspecialchars(strip_tags($this->review_status)) : 'None';
         $this->assignment_date = !empty($this->assignment_date) ? htmlspecialchars(strip_tags($this->assignment_date)) : null;
         $this->id = htmlspecialchars(strip_tags($this->id));
 
@@ -162,6 +167,7 @@ class Task {
         $stmt->bindParam(":assigned_to", $this->assigned_to);
         $stmt->bindParam(":department_id", $this->department_id);
         $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":review_status", $this->review_status);
         $stmt->bindParam(":assignment_date", $this->assignment_date);
         $stmt->bindParam(":id", $this->id);
 
@@ -204,6 +210,23 @@ class Task {
         $this->id = htmlspecialchars(strip_tags($this->id));
         
         $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":id", $this->id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Update review status only
+    public function updateReviewStatusOnly() {
+        $query = "UPDATE " . $this->table_name . " SET review_status=:review_status WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        
+        $this->review_status = htmlspecialchars(strip_tags($this->review_status));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        $stmt->bindParam(":review_status", $this->review_status);
         $stmt->bindParam(":id", $this->id);
         
         if($stmt->execute()) {

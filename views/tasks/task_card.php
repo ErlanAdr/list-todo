@@ -2,104 +2,96 @@
     
     <!-- Header: Title & Department -->
     <div class="flex items-start justify-between gap-2">
-        <h4 class="font-medium text-slate-800 dark:text-slate-100 task-title"><?= htmlspecialchars($t['name']) ?></h4>
-        <?php if(!empty($t['department_name'])): ?>
-            <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold rounded-md shrink-0">
+        <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+            <?= htmlspecialchars($t['name']) ?>
+        </h4>
+        <?php if (!empty($t['department_name'])): ?>
+            <span class="shrink-0 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
                 <?= htmlspecialchars($t['department_name']) ?>
             </span>
         <?php endif; ?>
     </div>
     
-    <!-- Detail Snippet -->
+    <!-- Review Status Badge -->
+    <?php if (isset($t['review_status']) && $t['review_status'] !== 'None'): ?>
+        <div>
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider
+                <?php 
+                    if ($t['review_status'] === 'Perlu Direview') echo 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50';
+                    elseif ($t['review_status'] === 'Perlu Direvisi') echo 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50';
+                    elseif ($t['review_status'] === 'Sudah Approve') echo 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50';
+                ?>">
+                <i class="ph ph-tag"></i> <?= htmlspecialchars($t['review_status']) ?>
+            </span>
+        </div>
+    <?php endif; ?>
+
+    <!-- Description Snippet -->
     <?php if(!empty($t['detail'])): ?>
-        <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2"><?= htmlspecialchars($t['detail']) ?></p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+            <?= htmlspecialchars($t['detail']) ?>
+        </p>
     <?php endif; ?>
-
-    <!-- Image Thumbnails -->
-    <?php if(!empty($t['images'])): ?>
-        <div class="flex flex-wrap gap-1 mt-1">
-            <?php foreach(array_slice($t['images'], 0, 3) as $img): ?>
-                <a href="<?= htmlspecialchars($img['file_path']) ?>" target="_blank" onclick="event.stopPropagation();" class="w-10 h-10 rounded-md overflow-hidden border border-slate-200 dark:border-slate-600 block">
-                    <img src="<?= htmlspecialchars($img['file_path']) ?>" class="w-full h-full object-cover hover:scale-110 transition-transform">
-                </a>
-            <?php endforeach; ?>
-            <?php if(count($t['images']) > 3): ?>
-                <div class="w-10 h-10 rounded-md bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-300">
-                    +<?= count($t['images']) - 3 ?>
+    
+    <!-- Meta Data -->
+    <div class="flex items-center justify-between mt-auto pt-2">
+        <div class="flex items-center gap-3">
+            <div class="flex -space-x-2">
+                <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300" title="<?= htmlspecialchars($t['assignee_name'] ?? 'Unassigned') ?>">
+                    <?= !empty($t['assignee_name']) ? strtoupper(substr($t['assignee_name'], 0, 2)) : '?' ?>
                 </div>
+            </div>
+            
+            <?php if($t['comment_count'] > 0): ?>
+            <div class="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-xs">
+                <i class="ph ph-chat-teardrop"></i>
+                <span><?= $t['comment_count'] ?></span>
+            </div>
             <?php endif; ?>
         </div>
-    <?php endif; ?>
-
-    <!-- Meta Info -->
-    <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
         
-        <!-- Assignee -->
-        <div class="flex items-center gap-1.5 task-assignee" title="Assigned to">
-            <?php if($t['assignee_name']): ?>
-                <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-[10px] shrink-0">
-                    <?= strtoupper(substr($t['assignee_name'], 0, 2)) ?>
-                </div>
-                <span class="truncate max-w-[80px]"><?= htmlspecialchars($t['assignee_name']) ?></span>
-            <?php else: ?>
-                <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 flex items-center justify-center shrink-0">
-                    <i class="ph ph-user"></i>
-                </div>
-                <span>Unassigned</span>
-            <?php endif; ?>
+        <?php if(!empty($t['assignment_date'])): ?>
+        <div class="flex items-center gap-1 text-xs font-medium <?= strtotime($t['assignment_date']) < time() && $t['status'] != 'Done' ? 'text-red-500' : 'text-slate-400 dark:text-slate-500' ?>">
+            <i class="ph ph-clock"></i>
+            <?= date('M d', strtotime($t['assignment_date'])) ?>
         </div>
-
-        <!-- Date or URL Icons -->
-        <div class="flex items-center gap-2">
-            <?php if(!empty($t['urls'])): ?>
-                <div class="group/urls relative flex items-center">
-                    <i class="ph ph-link text-sm text-blue-500"></i>
-                    <span class="ml-0.5"><?= count($t['urls']) ?></span>
-                    
-                    <!-- Tooltip with all URLs -->
-                    <div class="absolute bottom-full right-0 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 invisible group-hover/urls:opacity-100 group-hover/urls:visible transition-all z-50 shadow-lg">
-                        <?php foreach($t['urls'] as $url): ?>
-                            <a href="<?= htmlspecialchars($url['url']) ?>" target="_blank" onclick="event.stopPropagation();" class="block truncate hover:text-indigo-300 mb-1 last:mb-0">
-                                <?= htmlspecialchars($url['url']) ?>
-                            </a>
-                        <?php endforeach; ?>
-                        <div class="absolute top-full right-3 border-4 border-transparent border-t-slate-800"></div>
-                    </div>
-                </div>
-            <?php endif; ?>
-            
-            <?php if(!empty($t['comment_count']) && $t['comment_count'] > 0): ?>
-                <span class="flex items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" title="<?= $t['comment_count'] ?> Feedback">
-                    <i class="ph ph-chat-teardrop text-sm"></i>
-                    <span><?= $t['comment_count'] ?></span>
-                </span>
-            <?php endif; ?>
-            
-            <?php if(!empty($t['assignment_date'])): ?>
-                <span class="flex items-center gap-1" title="Date Assigned">
-                    <i class="ph ph-calendar-blank"></i>
-                    <?= date('M d', strtotime($t['assignment_date'])) ?>
-                </span>
-            <?php endif; ?>
-        </div>
+        <?php endif; ?>
     </div>
     
-    <!-- Quick Status Update (Hidden for guest) -->
+    <hr class="border-slate-100 dark:border-slate-700/50 my-1">
+
+    <!-- Quick Status Updates (Hidden for guest) -->
     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest'): ?>
-    <div class="mt-2 text-xs flex justify-end relative z-20">
-        <form action="index.php?action=task_update_status" method="POST" class="inline w-full text-right" onclick="event.preventDefault(); event.stopPropagation();">
-            <input type="hidden" name="id" value="<?= $t['id'] ?>">
-            <select name="status" onchange="this.form.submit()" class="bg-transparent border-none text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer focus:ring-0 py-0 pl-0 pr-6 text-xs text-right appearance-none" style="background-position: right 0.2rem center;">
-                <option value="To Do" <?= $t['status'] == 'To Do' ? 'selected' : '' ?>>To Do</option>
-                <option value="In Progress" <?= $t['status'] == 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                <option value="Perlu Direview" <?= $t['status'] == 'Perlu Direview' ? 'selected' : '' ?>>Perlu Direview</option>
-                <option value="Perlu Direvisi" <?= $t['status'] == 'Perlu Direvisi' ? 'selected' : '' ?>>Perlu Direvisi</option>
-                <option value="Sudah Approve" <?= $t['status'] == 'Sudah Approve' ? 'selected' : '' ?>>Sudah Approve</option>
-            </select>
-        </form>
+    <div class="mt-1 flex justify-between items-center relative z-20">
+        
+        <!-- Board Status Dropdown -->
+        <div class="flex-1">
+            <form action="index.php?action=task_update_status" method="POST" onclick="event.preventDefault(); event.stopPropagation();">
+                <input type="hidden" name="id" value="<?= $t['id'] ?>">
+                <select name="status" onchange="this.form.submit()" class="w-full bg-transparent border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer focus:ring-0 py-1 pl-2 pr-6 text-[10px] uppercase font-bold tracking-wider appearance-none" style="background-position: right 0.2rem center;">
+                    <option value="To Do" <?= $t['status'] == 'To Do' ? 'selected' : '' ?>>To Do</option>
+                    <option value="In Progress" <?= $t['status'] == 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                    <option value="Done" <?= $t['status'] == 'Done' ? 'selected' : '' ?>>Done</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- Review Status Dropdown -->
+        <div class="flex-1 ml-2">
+            <form action="index.php?action=task_update_review_status" method="POST" onclick="event.preventDefault(); event.stopPropagation();">
+                <input type="hidden" name="id" value="<?= $t['id'] ?>">
+                <select name="review_status" onchange="this.form.submit()" class="w-full bg-transparent border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer focus:ring-0 py-1 pl-2 pr-6 text-[10px] uppercase font-bold tracking-wider appearance-none" style="background-position: right 0.2rem center;">
+                    <option value="None" <?= ($t['review_status'] ?? 'None') == 'None' ? 'selected' : '' ?>>- Label -</option>
+                    <option value="Perlu Direview" <?= ($t['review_status'] ?? 'None') == 'Perlu Direview' ? 'selected' : '' ?>>Direview</option>
+                    <option value="Perlu Direvisi" <?= ($t['review_status'] ?? 'None') == 'Perlu Direvisi' ? 'selected' : '' ?>>Direvisi</option>
+                    <option value="Sudah Approve" <?= ($t['review_status'] ?? 'None') == 'Sudah Approve' ? 'selected' : '' ?>>Approve</option>
+                </select>
+            </form>
+        </div>
+
     </div>
     <?php else: ?>
-    <div class="mt-2 text-xs flex justify-end">
+    <div class="mt-1 flex justify-between text-xs">
         <span class="text-slate-400 dark:text-slate-500 font-medium"><?= htmlspecialchars($t['status']) ?></span>
     </div>
     <?php endif; ?>

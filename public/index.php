@@ -77,6 +77,12 @@ switch ($action) {
         $controller->update_status();
         break;
 
+    case 'task_update_review_status':
+        require_once __DIR__ . '/../controllers/TaskController.php';
+        $controller = new TaskController();
+        $controller->update_review_status();
+        break;
+
     case 'task_comment':
         require_once __DIR__ . '/../controllers/TaskController.php';
         $controller = new TaskController();

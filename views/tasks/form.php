@@ -57,13 +57,31 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Board Status -->
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
-                <select name="status" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border transition-colors">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <i class="ph ph-kanban text-slate-400 mr-1"></i> Board Status
+                </label>
+                <select name="status" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 border transition-colors cursor-pointer">
                     <option value="To Do" <?= $task['status'] == 'To Do' ? 'selected' : '' ?>>To Do</option>
                     <option value="In Progress" <?= $task['status'] == 'In Progress' ? 'selected' : '' ?>>In Progress</option>
                     <option value="Done" <?= $task['status'] == 'Done' ? 'selected' : '' ?>>Done</option>
+                </select>
+            </div>
+            
+            <!-- Review Status -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <i class="ph ph-tag text-slate-400 mr-1"></i> Label / Review Status
+                </label>
+                <select name="review_status" class="w-full rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 border transition-colors cursor-pointer">
+                    <option value="None" <?= (!isset($task['review_status']) || $task['review_status'] == 'None') ? 'selected' : '' ?>>- No Label -</option>
+                    <option value="Perlu Direview" <?= (isset($task['review_status']) && $task['review_status'] == 'Perlu Direview') ? 'selected' : '' ?>>Perlu Direview</option>
+                    <option value="Perlu Direvisi" <?= (isset($task['review_status']) && $task['review_status'] == 'Perlu Direvisi') ? 'selected' : '' ?>>Perlu Direvisi</option>
+                    <option value="Sudah Approve" <?= (isset($task['review_status']) && $task['review_status'] == 'Sudah Approve') ? 'selected' : '' ?>>Sudah Approve</option>
                 </select>
             </div>
         </div>
