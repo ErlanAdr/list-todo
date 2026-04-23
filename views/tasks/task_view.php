@@ -4,9 +4,17 @@
     </a>
     
     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest'): ?>
-    <a href="index.php?action=task_edit&id=<?= $task['id'] ?>" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2">
-        <i class="ph ph-pencil-simple"></i> Edit Task
-    </a>
+    <div class="flex items-center gap-3">
+        <a href="index.php?action=task_edit&id=<?= $task['id'] ?>" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+            <i class="ph ph-pencil-simple"></i> Edit Task
+        </a>
+        <form action="index.php?action=task_delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this task? This action cannot be undone.');" class="inline m-0">
+            <input type="hidden" name="id" value="<?= $task['id'] ?>">
+            <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                <i class="ph ph-trash"></i> Delete
+            </button>
+        </form>
+    </div>
     <?php endif; ?>
 </div>
 

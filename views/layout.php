@@ -60,6 +60,14 @@
                         Board
                     </a>
                 </li>
+                <!-- Report (For all logged in users, even guests can view) -->
+                <li>
+                    <a href="index.php?action=report" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'report') ? 'bg-indigo-600 hover:bg-indigo-700 border-l-4 border-indigo-400' : '' ?>">
+                        <i class="ph ph-chart-bar mr-3 text-lg"></i>
+                        Report
+                    </a>
+                </li>
+                
                 <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'super_admin'): ?>
                 <li>
                     <a href="index.php?action=users" class="flex items-center px-6 py-3 hover:bg-slate-800 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'users') ? 'bg-indigo-600 hover:bg-indigo-700 border-l-4 border-indigo-400' : '' ?>">

@@ -34,7 +34,8 @@ class Task {
                   LEFT JOIN users u ON t.assigned_to = u.id 
                   LEFT JOIN users creator ON t.created_by = creator.id
                   LEFT JOIN departments d ON t.department_id = d.id
-                  WHERE 1=1 ";
+                  WHERE 1=1 
+                  AND NOT (t.status = 'Done' AND t.created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)) ";
         
         $params = [];
         
@@ -256,6 +257,30 @@ class Task {
         ");
         $stmt->execute([$task_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    // Read Reports (Done tasks older than 7 days)
+    public function readReports() {
+        $query = "SELECT t.id, t.name, t.detail, t.assigned_to, t.status, t.review_status, t.assignment_date, t.created_at, DATE(t.created_at) as report_date,
+                  u.name as assignee_name, d.name as department_name, creator.name as creator_name,
+                  (SELECT COUNT(*) FROM task_comments tc WHERE tc.task_id = t.id) as comment_count
+                  FROM " . $this->table_name . " t 
+                  LEFT JOIN users u ON t.assigned_to = u.id 
+                  LEFT JOIN users creator ON t.created_by = creator.id
+                  LEFT JOIN departments d ON t.department_id = d.id
+                  WHERE t.status = 'Done' AND t.created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)
+                  ORDER BY t.created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        // Fetch tasks and append urls/images
+        $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach($tasks as &$t) {
+            $t['urls'] = $this->getUrls($t['id']);
+            $t['images'] = $this->getImages($t['id']);
+        }
+        return $tasks;
     }
     
     // Helpers for URLs

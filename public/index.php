@@ -89,6 +89,12 @@ switch ($action) {
         $controller->add_comment();
         break;
 
+    case 'report':
+        require_once __DIR__ . '/../controllers/TaskController.php';
+        $controller = new TaskController();
+        $controller->report();
+        break;
+
     case 'departments':
         require_once __DIR__ . '/../controllers/DepartmentController.php';
         $controller = new DepartmentController();

@@ -58,6 +58,23 @@ class TaskController {
             exit;
         }
     }
+    
+    public function report() {
+        $tasks = $this->task->readReports();
+        
+        // Group tasks by report_date
+        $grouped_reports = [];
+        foreach($tasks as $t) {
+            $date = $t['report_date'] ? date('Y-m-d', strtotime($t['report_date'])) : 'Unknown Date';
+            if (!isset($grouped_reports[$date])) {
+                $grouped_reports[$date] = [];
+            }
+            $grouped_reports[$date][] = $t;
+        }
+        
+        $content = __DIR__ . '/../views/tasks/report.php';
+        require __DIR__ . '/../views/layout.php';
+    }
 
     public function create() {
         $this->restrictGuest();
