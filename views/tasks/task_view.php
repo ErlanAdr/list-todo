@@ -65,7 +65,7 @@
                     <i class="ph ph-calendar-blank text-lg"></i>
                 </div>
                 <div>
-                    <div class="text-xs uppercase tracking-wider text-slate-400">Due Date</div>
+                    <div class="text-xs uppercase tracking-wider text-slate-400">Assign Date</div>
                     <div class="font-medium text-slate-700 dark:text-slate-200"><?= !empty($task['assignment_date']) ? date('d M Y', strtotime($task['assignment_date'])) : 'No Date' ?></div>
                 </div>
             </div>
