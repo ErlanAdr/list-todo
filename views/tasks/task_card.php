@@ -48,16 +48,16 @@ if ($t['status'] === 'In Progress') {
     <?php endif; ?>
     
     <!-- Meta Data -->
-    <div class="flex items-center justify-between mt-auto pt-2">
-        <div class="flex items-center gap-3">
-            <div class="flex -space-x-2">
-                <div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300 shadow-sm" title="<?= htmlspecialchars($t['assignee_name'] ?? 'Unassigned') ?>">
-                    <?= !empty($t['assignee_name']) ? strtoupper(substr($t['assignee_name'], 0, 2)) : '?' ?>
-                </div>
+    <div class="flex items-center justify-between mt-auto pt-3 border-t border-slate-100 dark:border-slate-700/50">
+        <div class="flex items-center gap-2">
+            <!-- Assignee Full Name -->
+            <div class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <i class="ph ph-user-circle text-slate-400"></i>
+                <?= !empty($t['assignee_name']) ? htmlspecialchars($t['assignee_name']) : '<span class="text-slate-400">Unassigned</span>' ?>
             </div>
             
             <?php if($t['comment_count'] > 0): ?>
-            <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-medium ml-2">
                 <i class="ph ph-chat-circle-dots"></i>
                 <span><?= $t['comment_count'] ?></span>
             </div>
@@ -65,15 +65,13 @@ if ($t['status'] === 'In Progress') {
         </div>
         
         <?php if(!empty($t['assignment_date'])): ?>
-        <div class="flex items-center gap-1 text-xs font-medium <?= strtotime($t['assignment_date']) < time() && $t['status'] != 'Done' ? 'text-rose-500' : 'text-slate-500 dark:text-slate-400' ?>">
+        <div class="flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
             <i class="ph ph-calendar-check"></i>
             <?= date('M d', strtotime($t['assignment_date'])) ?>
         </div>
         <?php endif; ?>
     </div>
     
-    <div class="border-t border-slate-100 dark:border-slate-700/50 my-2"></div>
-
     <!-- Quick Status Updates (Hidden for guest) -->
     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'guest'): ?>
     <div class="flex gap-2 items-center relative z-20">
